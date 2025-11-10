@@ -1,26 +1,26 @@
 [
   {
     "name": "IBM_Logo.ch8",
-    "path": "/Users/ize/Desktop/chip8-web/public/roms/IBM_Logo.ch8"
+    "path": "/roms/IBM_Logo.ch8"
   },
   {
     "name": "Pong1player.ch8",
-    "path": "/Users/ize/Desktop/chip8-web/public/roms/Pong1player.ch8"
+    "path": "/roms/Pong1player.ch8"
   },
   {
     "name": "Rocket_Launcher.ch8",
-    "path": "/Users/ize/Desktop/chip8-web/public/roms/Rocket_Launcher.ch8"
+    "path": "/roms/Rocket_Launcher.ch8"
   },
   {
     "name": "Space_Invaders_David_Winter.ch8",
-    "path": "/Users/ize/Desktop/chip8-web/public/roms/Space_Invaders_David_Winter.ch8"
+    "path": "/roms/Space_Invaders_David_Winter.ch8"
   },
   {
     "name": "Space_Invaders_David_Winter_alt.ch8",
-    "path": "/Users/ize/Desktop/chip8-web/public/roms/Space_Invaders_David_Winter_alt.ch8"
+    "path": "/roms/Space_Invaders_David_Winter_alt.ch8"
   },
   {
     "name": "Tetris_Fran_Dachille_1991.ch8",
-    "path": "/Users/ize/Desktop/chip8-web/public/roms/Tetris_Fran_Dachille_1991.ch8"
+    "path": "/roms/Tetris_Fran_Dachille_1991.ch8"
   }
 ]

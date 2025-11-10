@@ -13,7 +13,7 @@ const roms = fs.readdirSync(romsFolder).filter((file) => file.endsWith(".ch8"));
 
 const romList = roms.map((rom) => ({
   name: rom,
-  path: path.join(romsFolder, rom),
+  path: `/roms/${rom}`,
 }));
 
 fs.writeFileSync(`${publicFolder}/romList.json`, JSON.stringify(romList, null, 2));
