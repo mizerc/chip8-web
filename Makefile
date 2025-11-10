@@ -1,5 +1,5 @@
 buildRomListJsonFile:
 	node ./scripts/buildRomListJsonFile.js
 
-deploy:
+deploy: buildRomListJsonFile
 	npm run deploy
