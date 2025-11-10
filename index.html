@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chip8-web</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>CHIP8 EMULATOR</h1>
+      <p>Choose a ROM, then press LOAD ROM, then press RUN or CYCLE to start</p>
+      <canvas id="canvas"></canvas>
+      <div id="keyboard">
+        <div id="keyboard-row">
+          <button id="keyboard-button" data-key="1">1</button>
+          <button id="keyboard-button" data-key="2">2</button>
+          <button id="keyboard-button" data-key="3">3</button>
+          <button id="keyboard-button" data-key="4">4</button>
+        </div>
+        <div id="keyboard-row"></div>
+        <button id="run-button">RUN</button>
+        <button id="pause-button">PAUSE</button>
+        <button id="cycle-button">CYCLE</button>
+        <button id="reset-button">RESET</button>
+        <div id="diskette">
+          <select id="rom-select">
+            <option disabled>Load ROM...</option>
+          </select>
+          <button id="load-rom-button">LOAD ROM</button>
+        </div>
+      </div>
+      <h3>Registers</h3>
+      <div id="registers">
+        <div>OP: <input type="text" id="op-reg" value="0x0000" readonly /></div>
+        <div>
+          MNE: <input type="text" id="op-mne" value="0x0000" readonly />
+        </div>
+        <div>PC: <input type="text" id="pc-reg" value="0x0000" readonly /></div>
+        <div>I: <input type="text" id="i-reg" value="0x0000" readonly /></div>
+        <div>SP: <input type="text" id="sp-reg" value="0x0000" readonly /></div>
+        <div>DT: <input type="text" id="dt-reg" value="0x0000" readonly /></div>
+        <div>ST: <input type="text" id="st-reg" value="0x0000" readonly /></div>
+        <div>V0: <input type="text" id="v0-reg" value="0x0000" readonly /></div>
+        <div>V1: <input type="text" id="v1-reg" value="0x0000" readonly /></div>
+        <div>V2: <input type="text" id="v2-reg" value="0x0000" readonly /></div>
+        <div>V3: <input type="text" id="v3-reg" value="0x0000" readonly /></div>
+        <div>V4: <input type="text" id="v4-reg" value="0x0000" readonly /></div>
+        <div>V5: <input type="text" id="v5-reg" value="0x0000" readonly /></div>
+        <div>V6: <input type="text" id="v6-reg" value="0x0000" readonly /></div>
+        <div>V7: <input type="text" id="v7-reg" value="0x0000" readonly /></div>
+        <div>V8: <input type="text" id="v8-reg" value="0x0000" readonly /></div>
+        <div>V9: <input type="text" id="v9-reg" value="0x0000" readonly /></div>
+        <div>VA: <input type="text" id="va-reg" value="0x0000" readonly /></div>
+        <div>VB: <input type="text" id="vb-reg" value="0x0000" readonly /></div>
+        <div>VC: <input type="text" id="vc-reg" value="0x0000" readonly /></div>
+        <div>VD: <input type="text" id="vd-reg" value="0x0000" readonly /></div>
+        <div>VE: <input type="text" id="ve-reg" value="0x0000" readonly /></div>
+        <div>VF: <input type="text" id="vf-reg" value="0x0000" readonly /></div>
+      </div>
+      <h3>Memory</h3>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
