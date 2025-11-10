@@ -15,6 +15,8 @@ const domCanvas = document.getElementById("canvas") as HTMLCanvasElement;
 domCanvas.width = Chip8.VIDEO_W * VIDEO_SCALE;
 domCanvas.height = Chip8.VIDEO_H * VIDEO_SCALE;
 const domCanvasCtx = domCanvas.getContext("2d") as CanvasRenderingContext2D;
+domCanvasCtx.fillStyle = "black";
+domCanvasCtx.fillRect(0, 0, domCanvas.width, domCanvas.height);
 
 let loopRunning = false;
 const keyboardState = new Map<string, boolean>();
