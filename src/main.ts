@@ -122,9 +122,8 @@ function mainLoop(currentTimestampMs: number) {
 
 async function init() {
   // ROM SELECTOR POPULATION
-  const romList = await fetch("/romList.json");
+  const romList = await fetch(`${import.meta.env.BASE_URL}romList.json`);
   const romListJson = await romList.json();
-  console.log(romListJson);
   romListJson.forEach((rom: { name: string; path: string }) => {
     const option = document.createElement("option");
     option.value = rom.name;
@@ -140,7 +139,7 @@ async function init() {
         "rom-select"
       ) as HTMLSelectElement;
       const romFileName = romSelect.value;
-      const romUrl = `/roms/${romFileName}`;
+      const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
       const response = await fetch(romUrl);
       const arrayBuffer = await response.arrayBuffer();
       const romBytes = new Uint8Array(arrayBuffer);
