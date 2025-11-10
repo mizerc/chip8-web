@@ -32,7 +32,7 @@ function updateFieldHex(id: string, value: number, width: number) {
     (el as HTMLInputElement).value = hex;
   }
 }
-function updateFieldStr(id: string, value: string, width: number) {
+function updateFieldStr(id: string, value: string) {
   const el = document.getElementById(id) as HTMLInputElement | null;
   if (!el) return;
   if ("value" in el) {
@@ -43,7 +43,7 @@ function updateFieldStr(id: string, value: string, width: number) {
 }
 function updateRegisters() {
   updateFieldHex("op-reg", CHIP8.OPCODE, 4);
-  updateFieldStr("op-mne", `${getMnemonic(CHIP8.OPCODE)}`, 4);
+  updateFieldStr("op-mne", `${getMnemonic(CHIP8.OPCODE)}`);
   updateFieldHex("pc-reg", CHIP8.R_PC, 4);
   updateFieldHex("i-reg", CHIP8.R_I, 4);
   updateFieldHex("sp-reg", CHIP8.R_SP, 2);
