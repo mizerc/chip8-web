@@ -1,6 +1,6 @@
 import Chip8 from "./Chip8";
 import "./style.css";
-import { getMnemonic } from "./utils";
+import { getMnemonic } from "./getMnemonic";
 // import typescriptLogo from "./typescript.svg";
 
 const VIDEO_SCALE = 10;
@@ -56,6 +56,84 @@ function updateRegisters() {
   }
 }
 
+function updateMemoryView() {
+  const memoryView = document.getElementById(
+    "memory-view"
+  ) as HTMLTextAreaElement;
+  if (!memoryView) return;
+
+  let memoryText = "";
+  const bytesPerLine = 16;
+  const totalBytes = CHIP8.memory.length;
+
+  for (let addr = 0; addr < totalBytes; addr += bytesPerLine) {
+    // Address column
+    const addrHex = addr.toString(16).toUpperCase().padStart(4, "0");
+    memoryText += `${addrHex}: `;
+
+    // Hex bytes column
+    for (let i = 0; i < bytesPerLine; i++) {
+      if (addr + i < totalBytes) {
+        const currentAddr = addr + i;
+        const byte = CHIP8.memory[currentAddr];
+        const byteHex = byte.toString(16).toUpperCase().padStart(2, "0");
+
+        // Highlight PC and PC+1 bytes with brackets
+        if (currentAddr === CHIP8.R_PC) {
+          memoryText += `[${byteHex}]`;
+        } else if (currentAddr === CHIP8.R_PC + 1) {
+          memoryText += `[${byteHex}]`;
+        } else {
+          memoryText += byteHex + " ";
+        }
+      } else {
+        memoryText += "   ";
+      }
+    }
+
+    // ASCII column
+    memoryText += " | ";
+    for (let i = 0; i < bytesPerLine; i++) {
+      if (addr + i < totalBytes) {
+        const byte = CHIP8.memory[addr + i];
+        // Print ASCII character if printable, otherwise '.'
+        const char =
+          byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
+        memoryText += char;
+      }
+    }
+
+    memoryText += "\n";
+  }
+
+  memoryView.value = memoryText;
+
+  // Auto-scroll to PC location
+  const pcLine = Math.floor(CHIP8.R_PC / bytesPerLine);
+  const totalLines = Math.ceil(totalBytes / bytesPerLine);
+  const lineHeight = memoryView.scrollHeight / totalLines;
+
+  // Center the PC line in the viewport
+  const viewportHeight = memoryView.clientHeight;
+  const scrollPosition =
+    pcLine * lineHeight - viewportHeight / 2 + lineHeight / 2;
+
+  memoryView.scrollTop = Math.max(0, scrollPosition);
+}
+
+function resetRegisters() {
+  updateFieldHex("op-reg", 0, 4);
+  updateFieldStr("op-mne", "");
+  updateFieldHex("pc-reg", Chip8.START_ADDRESS, 4);
+  updateFieldHex("i-reg", 0, 4);
+  updateFieldHex("sp-reg", 0, 2);
+  updateFieldHex("dt-reg", 0, 2);
+  updateFieldHex("st-reg", 0, 2);
+  for (let i = 0; i < 16; i++) {
+    updateFieldHex(`v${i}-reg`, 0, 2);
+  }
+}
+
 function renderVideoMemory() {
   // Draw chip8 video memory to video canvas
   const canvasVideo = document.createElement("canvas");
@@ -105,14 +183,30 @@ function mainLoop(currentTimestampMs: number) {
   }
 
   cycleDelay.lastTimestampMs = currentTimestampMs;
-  // Update chip8 keypad memory
-  CHIP8.keypadMemory[0x0] = keyboardState.get("1") ? 1 : 0;
+  // Update chip8 keypad memory - map all 16 keys
+  CHIP8.keypadMemory[0x0] = keyboardState.get("0") ? 1 : 0;
+  CHIP8.keypadMemory[0x1] = keyboardState.get("1") ? 1 : 0;
+  CHIP8.keypadMemory[0x2] = keyboardState.get("2") ? 1 : 0;
+  CHIP8.keypadMemory[0x3] = keyboardState.get("3") ? 1 : 0;
+  CHIP8.keypadMemory[0x4] = keyboardState.get("4") ? 1 : 0;
+  CHIP8.keypadMemory[0x5] = keyboardState.get("5") ? 1 : 0;
+  CHIP8.keypadMemory[0x6] = keyboardState.get("6") ? 1 : 0;
+  CHIP8.keypadMemory[0x7] = keyboardState.get("7") ? 1 : 0;
+  CHIP8.keypadMemory[0x8] = keyboardState.get("8") ? 1 : 0;
+  CHIP8.keypadMemory[0x9] = keyboardState.get("9") ? 1 : 0;
+  CHIP8.keypadMemory[0xa] = keyboardState.get("A") ? 1 : 0;
+  CHIP8.keypadMemory[0xb] = keyboardState.get("B") ? 1 : 0;
+  CHIP8.keypadMemory[0xc] = keyboardState.get("C") ? 1 : 0;
+  CHIP8.keypadMemory[0xd] = keyboardState.get("D") ? 1 : 0;
+  CHIP8.keypadMemory[0xe] = keyboardState.get("E") ? 1 : 0;
+  CHIP8.keypadMemory[0xf] = keyboardState.get("F") ? 1 : 0;
 
   // Cycle chip8
   for (let i = 0; i < CYCLES_PER_FRAME; i++) {
     CHIP8.cycle();
   }
-  updateRegisters();
+  // updateRegisters();
+  // updateMemoryView();
 
   renderVideoMemory();
 
@@ -146,21 +240,67 @@ async function init() {
       const arrayBuffer = await response.arrayBuffer();
       const romBytes = new Uint8Array(arrayBuffer);
 
+      // LOAD ROM SEQUENCE
       loopRunning = false;
       CHIP8.reset();
       CHIP8.loadRom(romBytes);
+      updateMemoryView();
     });
 
-  // HTML DOM BUTTONS
-  const keyboardButtons = document.querySelectorAll("#keyboard-button");
-  keyboardButtons.forEach((button) => {
-    button.addEventListener("mouseup", () => {
+  // ROM UPLOAD EVENT LISTENERS
+  const uploadButton = document.getElementById("upload-rom-button");
+  const uploadInput = document.getElementById(
+    "rom-upload-input"
+  ) as HTMLInputElement;
+
+  uploadButton?.addEventListener("click", () => {
+    uploadInput?.click();
+  });
+
+  uploadInput?.addEventListener("change", async (event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    // Read the file
+    const arrayBuffer = await file.arrayBuffer();
+    const romBytes = new Uint8Array(arrayBuffer);
+
+    // Add the ROM to the select dropdown
+    const romSelect = document.getElementById(
+      "rom-select"
+    ) as HTMLSelectElement;
+    const option = document.createElement("option");
+    option.value = file.name;
+    option.textContent = file.name;
+    option.setAttribute("data-custom", "true");
+    romSelect.appendChild(option);
+
+    // Select the newly added ROM
+    romSelect.value = file.name;
+
+    // LOAD ROM SEQUENCE
+    loopRunning = false;
+    CHIP8.reset();
+    CHIP8.loadRom(romBytes);
+    updateMemoryView();
+
+    // Reset the input so the same file can be uploaded again if needed
+    target.value = "";
+  });
+
+  // HTML KEYPAD DOM BUTTONS
+  const keypadButtons = document.querySelectorAll(".keypad-button");
+  keypadButtons.forEach((button) => {
+    button.addEventListener("click", () => {
       const keyCode = (button as HTMLButtonElement).dataset.key;
-      keyboardState.set(keyCode || "", false);
-    });
-    button.addEventListener("mousedown", () => {
-      const keyCode = (button as HTMLButtonElement).dataset.key;
-      keyboardState.set(keyCode || "", true);
+      if (keyCode) {
+        // Toggle the key state
+        const currentState = keyboardState.get(keyCode) || false;
+        keyboardState.set(keyCode, !currentState);
+        // Toggle the active CSS class for visual feedback
+        button.classList.toggle("active");
+      }
     });
   });
 
@@ -175,6 +315,7 @@ async function init() {
   // CYCLE BUTTON EVENT LISTENER
   document.getElementById("cycle-button")?.addEventListener("click", () => {
     loopRunning = false;
+    updateMemoryView();
     CHIP8.cycle();
     updateRegisters();
     renderVideoMemory();
@@ -183,6 +324,8 @@ async function init() {
   document.getElementById("reset-button")?.addEventListener("click", () => {
     loopRunning = false;
     CHIP8.reset();
+    resetRegisters();
+    updateMemoryView();
   });
 
   // KEYBOARD EVENT LISTENERS
@@ -200,4 +343,5 @@ async function init() {
 
 window.addEventListener("DOMContentLoaded", () => {
   init();
+  updateMemoryView();
 });

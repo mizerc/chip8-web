@@ -1,5 +1,5 @@
 import { FONTSET } from "./Fontset";
-import { getMnemonic } from "./utils";
+import { getMnemonic } from "./getMnemonic";
 
 class Chip8 {
   static VIDEO_W: number = 64;
@@ -61,6 +61,12 @@ class Chip8 {
     this.R_I = 0;
     this.R_SP = 0;
   }
+  /**
+   *  Loads the ROM into the memory starting at the start address (0x200).
+   *  The ROM file is dumped into Chip8 memory starting at the start address (0x200).
+   * 
+   * @param romBytes - The bytes of the ROM to load
+   */
   loadRom(romBytes: Uint8Array) {
     console.log("Loading ROM");
     console.log("romBytes", romBytes);
@@ -189,11 +195,11 @@ class Chip8 {
         this.OP_Dxyn();
         break;
       case 0xe:
-        switch (nibble0) {
-          case 0x9e:
+        switch (lowByteFromOpcode) {
+          case 0x9E:
             this.OP_Ex9E();
             break;
-          case 0xa1:
+          case 0xA1:
             this.OP_ExA1();
             break;
         }

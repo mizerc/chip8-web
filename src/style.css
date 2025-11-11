@@ -67,3 +67,50 @@ h1 {
   font-size: 12px;
   font-weight: bold;
 }
+
+#memory-editor {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#memory-view {
+  width: 100%;
+  height: 400px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #3e3e3e;
+  padding: 10px;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.4;
+  overflow: auto;
+  white-space: pre;
+}
+
+#keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin: 20px auto;
+  max-width: 300px;
+}
+
+.keypad-button {
+  padding: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.keypad-button.active {
+  background-color: #4c7c5b;
+  transform: scale(0.95);
+}
