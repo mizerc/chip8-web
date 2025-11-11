@@ -4,7 +4,6 @@ export function getMnemonic(opcode: number) {
   const nibble1 = (opcode & 0x00f0) >> 4;
   const nibble0 = opcode & 0x000f;
   const lowByte = opcode & 0x00ff;
-  const highByte = opcode & 0xff00;
   // 0xABCD
   // [A]      [B]      [C]      [D]
   // [nibble3][nibble2][nibble1][nibble0]
