@@ -5,8 +5,8 @@
     <link rel="icon" type="image/svg+xml" href="/chip8-web/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>chip8-web</title>
-    <script type="module" crossorigin src="/chip8-web/assets/index-CN78OtH5.js"></script>
-    <link rel="stylesheet" crossorigin href="/chip8-web/assets/index-B5Xv-7Ce.css">
+    <script type="module" crossorigin src="/chip8-web/assets/index-BYEap-V8.js"></script>
+    <link rel="stylesheet" crossorigin href="/chip8-web/assets/index-oJnR_BGF.css">
   </head>
   <body>
     <div id="app">
@@ -14,13 +14,24 @@
       <p>Choose a ROM, then press LOAD ROM, then press RUN or CYCLE to start</p>
       <canvas id="canvas"></canvas>
       <div id="keyboard">
-        <div id="keyboard-row">
-          <button id="keyboard-button" data-key="1">1</button>
-          <button id="keyboard-button" data-key="2">2</button>
-          <button id="keyboard-button" data-key="3">3</button>
-          <button id="keyboard-button" data-key="4">4</button>
+        <div id="keypad">
+          <button class="keypad-button" data-key="1">1</button>
+          <button class="keypad-button" data-key="2">2</button>
+          <button class="keypad-button" data-key="3">3</button>
+          <button class="keypad-button" data-key="4">4</button>
+          <button class="keypad-button" data-key="5">5</button>
+          <button class="keypad-button" data-key="6">6</button>
+          <button class="keypad-button" data-key="7">7</button>
+          <button class="keypad-button" data-key="8">8</button>
+          <button class="keypad-button" data-key="9">9</button>
+          <button class="keypad-button" data-key="0">0</button>
+          <button class="keypad-button" data-key="A">A</button>
+          <button class="keypad-button" data-key="B">B</button>
+          <button class="keypad-button" data-key="C">C</button>
+          <button class="keypad-button" data-key="D">D</button>
+          <button class="keypad-button" data-key="E">E</button>
+          <button class="keypad-button" data-key="F">F</button>
         </div>
-        <div id="keyboard-row"></div>
         <button id="run-button">RUN</button>
         <button id="pause-button">PAUSE</button>
         <button id="cycle-button">CYCLE</button>
@@ -30,14 +41,16 @@
             <option disabled>Load ROM...</option>
           </select>
           <button id="load-rom-button">LOAD ROM</button>
+          <input type="file" id="rom-upload-input" accept=".ch8" style="display: none;" />
+          <button id="upload-rom-button">UPLOAD ROM</button>
         </div>
       </div>
       <h3>Registers</h3>
       <div id="registers">
-        <div>OP: <input type="text" id="op-reg" value="0x0000" readonly /></div>
-        <div>
-          MNE: <input type="text" id="op-mne" value="0x0000" readonly />
+        <div style="grid-column: span 4;">
+          <div>MNE: <input type="text" id="op-mne" value="0x0000" readonly style="width: 90%;" /></div>
         </div>
+        <div>OP: <input type="text" id="op-reg" value="0x0000" readonly /></div>
         <div>PC: <input type="text" id="pc-reg" value="0x0000" readonly /></div>
         <div>I: <input type="text" id="i-reg" value="0x0000" readonly /></div>
         <div>SP: <input type="text" id="sp-reg" value="0x0000" readonly /></div>
@@ -61,6 +74,9 @@
         <div>VF: <input type="text" id="vf-reg" value="0x0000" readonly /></div>
       </div>
       <h3>Memory</h3>
+      <div id="memory-editor">
+        <textarea id="memory-view" readonly spellcheck="false"></textarea>
+      </div>
     </div>
 
   </body>
