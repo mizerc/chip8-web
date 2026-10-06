@@ -1,4 +1,5 @@
-// Must be 5 bytes per character
+// FONT DEFINED AS 5 BYTES PER CHARACTER
+// 16 CHARACTERS (0-F)
 // prettier-ignore
 export const FONTSET = [
     // 0

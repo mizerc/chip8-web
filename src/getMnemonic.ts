@@ -1,26 +1,30 @@
 export function getMnemonic(opcode: number) {
+  // MASK TO EXTRACT NIBBLES
   const nibble3 = (opcode & 0xf000) >> 12;
   const nibble2 = (opcode & 0x0f00) >> 8;
   const nibble1 = (opcode & 0x00f0) >> 4;
-  const nibble0 = opcode & 0x000f;
-  const lowByte = opcode & 0x00ff;
+  const nibble0 = opcode & 0x000F;
+  const lowByte = opcode & 0x00FF;
+
+  // OUTPUT
+  let mnemonic = "";
+
   // 0xABCD
   // [A]      [B]      [C]      [D]
   // [nibble3][nibble2][nibble1][nibble0]
-  let mnemonic = "";
   switch (nibble3) {
     case 0x0:
       switch (nibble0) {
         case 0x0:
           mnemonic = "CLS";
           break;
-        case 0xe:
+        case 0xE:
           mnemonic = "RET";
           break;
       }
       break;
     case 0x1:
-      mnemonic = `1) JP nnn (0x${(opcode & 0x0FFF).toString(16).toUpperCase().padStart(3, "0")})`;
+      mnemonic = `1) JP nnn (0x${(opcode & 0x0fff).toString(16).toUpperCase().padStart(3, "0")})`;
       break;
     case 0x2:
       mnemonic = "2) CALL nnn";
@@ -35,10 +39,10 @@ export function getMnemonic(opcode: number) {
       mnemonic = "5) SE Vx, Vy";
       break;
     case 0x6:
-      mnemonic = `6) LD Vx, byte (Vx=${nibble2}, byte=${(opcode & 0x00FF).toString(16).toUpperCase().padStart(2, "0")})`;
+      mnemonic = `6) LD Vx, byte (Vx=${nibble2}, byte=${(opcode & 0x00ff).toString(16).toUpperCase().padStart(2, "0")})`;
       break;
     case 0x7:
-      mnemonic = `7) ADD Vx, byte (0x${(opcode & 0x00FF).toString(16).toUpperCase().padStart(2, "0")})`;
+      mnemonic = `7) ADD Vx, byte (0x${(opcode & 0x00ff).toString(16).toUpperCase().padStart(2, "0")})`;
       break;
     case 0x8:
       switch (nibble0) {
@@ -51,13 +55,13 @@ export function getMnemonic(opcode: number) {
       mnemonic = `9)SNE Vx, Vy (Vx=${nibble2}, Vy=${nibble1})`;
       break;
     case 0xa:
-      mnemonic = `A) LD I, address (I=${(opcode & 0x0FFF).toString(16).toUpperCase().padStart(3, "0")})`;
+      mnemonic = `A) LD I, address (I=${(opcode & 0x0fff).toString(16).toUpperCase().padStart(3, "0")})`;
       break;
     case 0xb:
-      mnemonic = `B) JP V0, nnn (PC=${(opcode & 0x0FFF).toString(16).toUpperCase().padStart(3, "0")} = 0x${(opcode & 0x0FFF).toString(16).toUpperCase().padStart(3, "0")})`;
+      mnemonic = `B) JP V0, nnn (PC=${(opcode & 0x0fff).toString(16).toUpperCase().padStart(3, "0")} = 0x${(opcode & 0x0fff).toString(16).toUpperCase().padStart(3, "0")})`;
       break;
     case 0xc:
-      mnemonic = `C) RND Vx, byte (Vx=${nibble2}, byte=${(opcode & 0x00FF).toString(16).toUpperCase().padStart(2, "0")} = 0x${(opcode & 0x00FF).toString(16).toUpperCase().padStart(2, "0")})`;
+      mnemonic = `C) RND Vx, byte (Vx=${nibble2}, byte=${(opcode & 0x00ff).toString(16).toUpperCase().padStart(2, "0")} = 0x${(opcode & 0x00ff).toString(16).toUpperCase().padStart(2, "0")})`;
       break;
     case 0xd:
       // mnemonic = "DRW Vx, Vy, height";
@@ -65,7 +69,7 @@ export function getMnemonic(opcode: number) {
       break;
     case 0xe:
       switch (lowByte) {
-        case 0x9E:
+        case 0x9e:
           mnemonic = "E9e) SKP Vx";
           break;
       }

@@ -2,6 +2,7 @@ import { FONTSET } from "./Fontset";
 import { getMnemonic } from "./getMnemonic";
 
 class Chip8 {
+  // CONSTANTS
   static VIDEO_W: number = 64;
   static VIDEO_H: number = 32;
   static MEMORY_SIZE: number = 4096;
@@ -15,10 +16,14 @@ class Chip8 {
   static ARG_0NNN_MASK: number = 0x0fff;
   static ARG_0XNN_MASK: number = 0x0f00;
   static BYTES_PER_CHAR: number = 5;
+
+  // MEMORY
   memory: Uint8Array;
   keypadMemory: Uint8Array;
   videoMemory: Uint8Array;
   stackMemory: Uint16Array;
+
+  // REGISTERS
   R_PC: number;
   R_SP: number;
   R_I: number;
@@ -26,6 +31,7 @@ class Chip8 {
   OPCODE: number;
   R_AUDIO_TIMER: number;
   R_DELAY_TIMER: number;
+
   constructor() {
     this.memory = new Uint8Array(Chip8.MEMORY_SIZE);
     this.keypadMemory = new Uint8Array(Chip8.KEYPAD_SIZE);
@@ -40,12 +46,14 @@ class Chip8 {
     this.R_AUDIO_TIMER = 0;
     this.R_DELAY_TIMER = 0;
   }
+
   copyFontset() {
     console.log("Copying Fontset");
     FONTSET.forEach((byte, index) => {
       this.memory[Chip8.FONTSET_START_ADDRESS + index] = byte;
     });
   }
+
   reset() {
     console.log("Resetting Chip8");
     this.memory.fill(0);
@@ -61,10 +69,11 @@ class Chip8 {
     this.R_I = 0;
     this.R_SP = 0;
   }
+
   /**
    *  Loads the ROM into the memory starting at the start address (0x200).
    *  The ROM file is dumped into Chip8 memory starting at the start address (0x200).
-   * 
+   *
    * @param romBytes - The bytes of the ROM to load
    */
   loadRom(romBytes: Uint8Array) {
@@ -76,10 +85,11 @@ class Chip8 {
         "memory",
         Chip8.START_ADDRESS + index,
         "Hex: " + (Chip8.START_ADDRESS + index).toString(16),
-        "Value: " + byte.toString(16)
+        "Value: " + byte.toString(16),
       );
     });
   }
+
   cycle() {
     // Fetch opcode
     // Fetch 2 bytes from memory in Big-endian order
@@ -196,10 +206,10 @@ class Chip8 {
         break;
       case 0xe:
         switch (lowByteFromOpcode) {
-          case 0x9E:
+          case 0x9e:
             this.OP_Ex9E();
             break;
-          case 0xA1:
+          case 0xa1:
             this.OP_ExA1();
             break;
         }

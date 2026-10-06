@@ -1,5 +1,4 @@
 import Chip8 from "./Chip8";
-import "./style.css";
 import { getMnemonic } from "./getMnemonic";
 // import typescriptLogo from "./typescript.svg";
 
@@ -58,7 +57,7 @@ function updateRegisters() {
 
 function updateMemoryView() {
   const memoryView = document.getElementById(
-    "memory-view"
+    "memory-view",
   ) as HTMLTextAreaElement;
   if (!memoryView) return;
 
@@ -140,13 +139,13 @@ function renderVideoMemory() {
   canvasVideo.width = Chip8.VIDEO_W;
   canvasVideo.height = Chip8.VIDEO_H;
   const canvasVideoCtx = canvasVideo.getContext(
-    "2d"
+    "2d",
   ) as CanvasRenderingContext2D;
   const imageData = canvasVideoCtx.getImageData(
     0,
     0,
     Chip8.VIDEO_W,
-    Chip8.VIDEO_H
+    Chip8.VIDEO_H,
   );
   for (let i = 0; i < Chip8.VIDEO_W * Chip8.VIDEO_H; i++) {
     const pixelIndex = i * 4;
@@ -169,7 +168,7 @@ function renderVideoMemory() {
     0,
     0,
     domCanvas.width,
-    domCanvas.height
+    domCanvas.height,
   );
 }
 
@@ -217,8 +216,9 @@ function mainLoop(currentTimestampMs: number) {
 }
 
 async function init() {
-  // ROM SELECTOR POPULATION
-  const romList = await fetch(`${import.meta.env.BASE_URL}romList.json`);
+  // BUILD DOM FOR ROM SELECTOR
+  const baseURL = import.meta.env.BASE_URL;
+  const romList = await fetch(`${baseURL}romList.json`);
   const romListJson = await romList.json();
   romListJson.forEach((rom: { name: string; path: string }) => {
     const option = document.createElement("option");
@@ -232,7 +232,7 @@ async function init() {
     .getElementById("load-rom-button")
     ?.addEventListener("click", async () => {
       const romSelect = document.getElementById(
-        "rom-select"
+        "rom-select",
       ) as HTMLSelectElement;
       const romFileName = romSelect.value;
       const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
@@ -250,7 +250,7 @@ async function init() {
   // ROM UPLOAD EVENT LISTENERS
   const uploadButton = document.getElementById("upload-rom-button");
   const uploadInput = document.getElementById(
-    "rom-upload-input"
+    "rom-upload-input",
   ) as HTMLInputElement;
 
   uploadButton?.addEventListener("click", () => {
@@ -268,7 +268,7 @@ async function init() {
 
     // Add the ROM to the select dropdown
     const romSelect = document.getElementById(
-      "rom-select"
+      "rom-select",
     ) as HTMLSelectElement;
     const option = document.createElement("option");
     option.value = file.name;
@@ -312,6 +312,7 @@ async function init() {
   document.getElementById("pause-button")?.addEventListener("click", () => {
     loopRunning = false;
   });
+
   // CYCLE BUTTON EVENT LISTENER
   document.getElementById("cycle-button")?.addEventListener("click", () => {
     loopRunning = false;
@@ -320,6 +321,7 @@ async function init() {
     updateRegisters();
     renderVideoMemory();
   });
+
   // RESET BUTTON EVENT LISTENER
   document.getElementById("reset-button")?.addEventListener("click", () => {
     loopRunning = false;
