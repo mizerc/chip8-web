@@ -54,6 +54,25 @@ class Chip8 {
     });
   }
 
+  updateKeyboardMemory(keyboardState: Map<string, boolean>) {
+    this.keypadMemory[0x0] = keyboardState.get("0") ? 1 : 0;
+    this.keypadMemory[0x1] = keyboardState.get("1") ? 1 : 0;
+    this.keypadMemory[0x2] = keyboardState.get("2") ? 1 : 0;
+    this.keypadMemory[0x3] = keyboardState.get("3") ? 1 : 0;
+    this.keypadMemory[0x4] = keyboardState.get("4") ? 1 : 0;
+    this.keypadMemory[0x5] = keyboardState.get("5") ? 1 : 0;
+    this.keypadMemory[0x6] = keyboardState.get("6") ? 1 : 0;
+    this.keypadMemory[0x7] = keyboardState.get("7") ? 1 : 0;
+    this.keypadMemory[0x8] = keyboardState.get("8") ? 1 : 0;
+    this.keypadMemory[0x9] = keyboardState.get("9") ? 1 : 0;
+    this.keypadMemory[0xa] = keyboardState.get("A") ? 1 : 0;
+    this.keypadMemory[0xb] = keyboardState.get("B") ? 1 : 0;
+    this.keypadMemory[0xc] = keyboardState.get("C") ? 1 : 0;
+    this.keypadMemory[0xd] = keyboardState.get("D") ? 1 : 0;
+    this.keypadMemory[0xe] = keyboardState.get("E") ? 1 : 0;
+    this.keypadMemory[0xf] = keyboardState.get("F") ? 1 : 0;
+  }
+
   reset() {
     console.log("Resetting Chip8");
     this.memory.fill(0);
