@@ -8,13 +8,18 @@ export class DomHandler {
   domCanvas: HTMLCanvasElement;
   domCanvasCtx: CanvasRenderingContext2D;
   constructor() {
+    // Initial keyboard state
     this.keyboardState = new Map<string, boolean>();
+
+    // Canvas and context
     this.domCanvas = document.getElementById("canvas") as HTMLCanvasElement;
     this.domCanvas.width = Chip8.VIDEO_W * VIDEO_SCALE;
     this.domCanvas.height = Chip8.VIDEO_H * VIDEO_SCALE;
     this.domCanvasCtx = this.domCanvas.getContext(
       "2d",
     ) as CanvasRenderingContext2D;
+
+    // Clear canvas initially
     this.domCanvasCtx.fillStyle = "black";
     this.domCanvasCtx.fillRect(
       0,
@@ -22,17 +27,106 @@ export class DomHandler {
       this.domCanvas.width,
       this.domCanvas.height,
     );
+
+    // Update ROM select dropdown with available ROMs
+    const asyncUpdateRomList = async () => {
+      const romList = await fetch(`${import.meta.env.BASE_URL}romList.json`);
+      const romListJson = await romList.json();
+      romListJson.forEach((rom: { name: string; path: string }) => {
+        const option = document.createElement("option");
+        option.value = rom.name;
+        option.textContent = rom.name;
+        document.getElementById("rom-select")?.appendChild(option);
+      });
+    };
+    asyncUpdateRomList();
   }
+  flipLedIndicator = () => {
+    const ledIndicator = document.getElementById("led-indicator");
+    if (!ledIndicator) {
+      return;
+    }
+    if (ledIndicator.classList.contains("led-off")) {
+      ledIndicator.classList.remove("led-off");
+      ledIndicator.classList.add("led-on");
+    } else {
+      ledIndicator.classList.remove("led-on");
+      ledIndicator.classList.add("led-off");
+    }
+  };
+  updateLedIndicator = (state: "on" | "off" | "halt" | "alert" | "reset") => {
+    const ledIndicator = document.getElementById("led-indicator");
+    if (!ledIndicator) {
+      return;
+    }
+    if (state === "on") {
+      ledIndicator.classList.remove(
+        "led-off",
+        "led-halt",
+        "led-alert",
+        "led-reset",
+      );
+      ledIndicator.classList.add("led-on");
+    } else if (state === "off") {
+      ledIndicator.classList.remove(
+        "led-on",
+        "led-halt",
+        "led-alert",
+        "led-reset",
+      );
+      ledIndicator.classList.add("led-off");
+    } else if (state === "halt") {
+      ledIndicator.classList.remove(
+        "led-on",
+        "led-off",
+        "led-alert",
+        "led-reset",
+      );
+      ledIndicator.classList.add("led-halt");
+    } else if (state === "alert") {
+      ledIndicator.classList.remove(
+        "led-on",
+        "led-off",
+        "led-halt",
+        "led-reset",
+      );
+      ledIndicator.classList.add("led-alert");
+    } else if (state === "reset") {
+      ledIndicator.classList.remove(
+        "led-on",
+        "led-off",
+        "led-halt",
+        "led-alert",
+      );
+      ledIndicator.classList.add("led-reset");
+    }
+  };
+  updateSpeedSelector = (targetFps: number) => {
+    const speedSelect = document.getElementById(
+      "speed-select",
+    ) as HTMLSelectElement;
+    speedSelect.value = targetFps.toString();
+  };
   attachListeners = (handlers: {
     onResetPress: () => void;
     onRunPress: () => void;
     onPausePress: () => void;
     onCyclePress: () => void;
+    onSpeedDropdownChange: (speed: number) => void;
+    onRomReadDone: (romBytes: Uint8Array) => void;
   }) => {
     // DOM BUTTONS
     document.getElementById("reset-button")?.addEventListener("click", () => {
       handlers.onResetPress();
-
+    });
+    document.getElementById("start-button")?.addEventListener("click", () => {
+      handlers.onRunPress();
+    });
+    document.getElementById("pause-button")?.addEventListener("click", () => {
+      handlers.onPausePress();
+    });
+    document.getElementById("cycle-button")?.addEventListener("click", () => {
+      handlers.onCyclePress();
     });
     // KEYBOARD EVENT
     window.addEventListener("keydown", (e) => {
@@ -44,6 +138,29 @@ export class DomHandler {
       const key = e.key.toUpperCase();
       console.log(key);
       this.keyboardState.set(key, false);
+    });
+    // ROM SELECT OR LOAD ROM BUTTON
+    // ROM loader event listener
+    document
+      .getElementById("load-rom-button")
+      ?.addEventListener("click", async () => {
+        const romSelect = document.getElementById(
+          "rom-select",
+        ) as HTMLSelectElement;
+        const romFileName = romSelect.value;
+        const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
+        const response = await fetch(romUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const romBytes = new Uint8Array(arrayBuffer);
+        handlers.onRomReadDone(romBytes);
+      });
+    // SPEED SELECTOR
+    const speedSelect = document.getElementById(
+      "speed-select",
+    ) as HTMLSelectElement;
+    speedSelect.addEventListener("change", () => {
+      const speed = parseInt(speedSelect.value, 10);
+      handlers.onSpeedDropdownChange(speed);
     });
     // DOM KEYPAD BUTTONS
     const keypadButtons = document.querySelectorAll(".keypad-button");
@@ -72,22 +189,22 @@ export class DomHandler {
     });
   };
   updateFieldStr = (id: string, value: string) => {
-    const el = document.getElementById(id) as HTMLInputElement | null;
+    const el = document.getElementById(id);
     if (!el) return;
-    if ("value" in el) {
+    if (el instanceof HTMLInputElement) {
       el.value = value;
     } else {
-      (el as HTMLInputElement).value = value;
+      el.textContent = value;
     }
   };
   updateFieldHex = (id: string, value: number, width: number) => {
-    const el = document.getElementById(id) as HTMLInputElement | null;
+    const el = document.getElementById(id);
     if (!el) return;
-    const hex = value.toString(16).toUpperCase().padStart(width, "0");
-    if ("value" in el) {
+    const hex = `A:` + value.toString(16).toUpperCase().padStart(width, "0");
+    if (el instanceof HTMLInputElement) {
       el.value = hex;
     } else {
-      (el as HTMLInputElement).value = hex;
+      el.textContent = hex;
     }
   };
   updateRegisters = (chip8: Chip8) => {
@@ -142,6 +259,12 @@ export class DomHandler {
     // Update the video canvas with the new image data
     backCanvasCtx.putImageData(imageData, 0, 0);
 
+    /**
+     * Since backCanvas has lower resolution, 
+     * it will be scaled up when drawn onto the domCanvas,
+     * creating a pixelated effect.
+     */
+
     // Draw backCanvas onto domCanvas
     this.domCanvasCtx.imageSmoothingEnabled = false;
     this.domCanvasCtx.drawImage(
@@ -158,8 +281,9 @@ export class DomHandler {
   };
   updateMemoryViewDom = (chip8: Chip8) => {
     const memoryViewDom = document.getElementById(
-      "memory-view",
+      "memory-textarea",
     ) as HTMLTextAreaElement;
+
     if (!memoryViewDom) return;
 
     let memoryText = "";
@@ -171,7 +295,7 @@ export class DomHandler {
       const addrHex = addr.toString(16).toUpperCase().padStart(4, "0");
       memoryText += `${addrHex}: `;
 
-      // Hex bytes column
+      // For each byte of current line
       for (let i = 0; i < bytesPerLine; i++) {
         if (addr + i < totalBytes) {
           const currentAddr = addr + i;
@@ -180,9 +304,9 @@ export class DomHandler {
 
           // Highlight PC and PC+1 bytes with brackets
           if (currentAddr === chip8.R_PC) {
-            memoryText += `[${byteHex}]`;
+            memoryText += `[${byteHex}`;
           } else if (currentAddr === chip8.R_PC + 1) {
-            memoryText += `[${byteHex}]`;
+            memoryText += `${byteHex}]`;
           } else {
             memoryText += byteHex + " ";
           }

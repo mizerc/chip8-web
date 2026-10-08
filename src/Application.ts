@@ -6,9 +6,8 @@ import Chip8 from "./Chip8";
 import { DomHandler } from "./DomHandler";
 
 export class Application {
-  FRAME_DELAY_TARGET_MS = 100;
+  TARGET_FPS = 1;
   CYCLES_PER_FRAME = 2;
-  baseURL = import.meta.env.BASE_URL;
 
   private chip8: Chip8;
   private domHandler: DomHandler;
@@ -26,19 +25,40 @@ export class Application {
     };
   }
   init = () => {
+    // Make sure the speed dropdown is updated to the initial TARGET_FPS
+    this.domHandler.updateSpeedSelector(this.TARGET_FPS);
+
+    // Attach event listeners to DOM elements
     this.domHandler.attachListeners({
+      onSpeedDropdownChange: (newFPS: number) => {
+        console.log(`FPS changed to: ${newFPS}`);
+        this.TARGET_FPS = newFPS;
+      },
+      onRomReadDone: (romBytes: Uint8Array) => {
+        this.domHandler.updateLedIndicator("halt");
+        this.loopState.isRunning = false;
+        this.chip8.reset();
+        this.chip8.loadRom(romBytes);
+        this.domHandler.updateMemoryViewDom(this.chip8);
+      },
       onResetPress: () => {
+        this.domHandler.updateLedIndicator("off");
         this.loopState.isRunning = false;
         this.chip8.reset();
         this.domHandler.resetRegisters();
         this.domHandler.updateMemoryViewDom(this.chip8);
       },
       onRunPress: () => {
+        this.domHandler.updateRegisters(this.chip8);
+        this.domHandler.updateMemoryViewDom(this.chip8);
+        this.domHandler.renderVideoMemoryToCanva(this.chip8);
+        this.domHandler.updateLedIndicator("on");
         this.loopState.isRunning = true;
         requestAnimationFrame(this.loop);
       },
       onPausePress: () => {
         this.loopState.isRunning = false;
+        this.domHandler.updateLedIndicator("halt");
       },
       onCyclePress: () => {
         this.loopState.isRunning = false;
@@ -48,17 +68,24 @@ export class Application {
         this.domHandler.renderVideoMemoryToCanva(this.chip8);
       },
     });
+
+    // Init loop
+    requestAnimationFrame(this.loop);
   };
   loop = (currentTimestampMs: number) => {
     // Timing
     const dtMs = currentTimestampMs - this.loopState.lastTimestampMs;
-    if (dtMs < this.FRAME_DELAY_TARGET_MS) {
+    const FRAME_DELAY_TARGET_MS = 1000 / this.TARGET_FPS;
+    if (dtMs < FRAME_DELAY_TARGET_MS) {
       if (this.loopState.isRunning) {
         requestAnimationFrame(this.loop);
       }
       return;
     }
     this.loopState.lastTimestampMs = currentTimestampMs;
+
+    // Grab led indicator state from the DOM if needed
+    this.domHandler.flipLedIndicator();
 
     // Update input state
     this.chip8.updateKeyboardMemory(this.domHandler.keyboardState);
@@ -69,7 +96,7 @@ export class Application {
     }
 
     // Don't update dom register while cycling the chip8
-    // updateRegisters();
+    this.domHandler.updateRegisters(this.chip8);
     // updateMemoryView();
 
     // Update video memory to canvas
@@ -80,36 +107,4 @@ export class Application {
       requestAnimationFrame(this.loop);
     }
   };
-}
-
-async function init() {
-  // Update ROM select dropdown with available ROMs
-  const romList = await fetch(`${this.baseURL}romList.json`);
-  const romListJson = await romList.json();
-  romListJson.forEach((rom: { name: string; path: string }) => {
-    const option = document.createElement("option");
-    option.value = rom.name;
-    option.textContent = rom.name;
-    document.getElementById("rom-select")?.appendChild(option);
-  });
-
-  // ROM loader event listener
-  document
-    .getElementById("load-rom-button")
-    ?.addEventListener("click", async () => {
-      const romSelect = document.getElementById(
-        "rom-select",
-      ) as HTMLSelectElement;
-      const romFileName = romSelect.value;
-      const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
-      const response = await fetch(romUrl);
-      const arrayBuffer = await response.arrayBuffer();
-      const romBytes = new Uint8Array(arrayBuffer);
-
-      // LOAD ROM SEQUENCE
-      loopRunning = false;
-      chip8.reset();
-      chip8.loadRom(romBytes);
-      domHandler.updateMemoryViewDom(chip8);
-    });
 }

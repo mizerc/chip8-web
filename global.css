@@ -20,61 +20,35 @@
   background-color: #242424;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  border: 1px solid red;
 }
 
-h1,
-h2,
-h3,
-h4 {
-  padding: 8px;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-h3 {
-  font-size: 1.5em;
-  line-height: 1.2;
-}
-
-h4 {
-  font-size: 1.0em;
-  line-height: 1.2;
+p {
+  font-family: 'Arial', cursive;
+  font-size: 12px;
 }
 
 input,
 select,
 button {
   color: #ffffff;
-  font-family: 'Arial', cursive;
-  font-size: 16px;
   height: 36px;
   padding: 0 8px;
   margin: 4px;
   background-color: #1e1e1e;
   border: 2px solid #040404;
   border-left: 2px solid #625b5b;
-  border-top: 2px solid #625b5b;
+  border-top: 2px solid #7d6b6b;
   user-select: none;
   cursor: pointer;
+}
+
+select {
+  min-width: 100px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
 }
 
 button:hover {
@@ -86,64 +60,21 @@ button:active {
   transform: scale(0.95);
 }
 
-
-/* 2 COL LAYOUT, COL 2 GOES UNDER COL 1 */
-.twocolcontainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+ul {
+  font-family: 'Arial', cursive;
+  text-align: left;
+  font-size: 12px;
 }
 
-.twocolcol {
-  flex: 1 1 300px;
-  /* grow, shrink, minimum width before wrapping */
+div.instructions {
+  text-align: left;
 }
 
-.twocolcell {
-  padding: 12px;
-  background: #eee;
-  border: 1px solid #ccc;
-}
-
-
-/* === GRID-LAYOUT 2 CELLS WIDE, FULL VIEWPORT === */
-
-.grid-layout-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  width: 100vw;
-  height: 100vh;
-}
-
-.grid-layout-2 h3 {
-  font-size: 1.5em;
-  margin: 1rem;
-  color: rgba(196, 195, 195, 0.87);
-}
-
-.grid-layout-2 .cellwhole {
-  grid-column: span 2;
-  border: 1px solid #3e3e3e;
-}
-
-.grid-layout-2 .cell {
-  border: 1px solid #3e3e3e;
-}
-
-
-/* canvas width is 640 */
-@media (max-width: 1300px) {
-  .grid-layout-2 {
-    border: 1px solid red;
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .grid-layout-2 .cell4,
-  .grid-layout-2 .cell2 {
-    grid-column: span 1;
-  }
+/* stay at top visible if user scroll down */
+div.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 /* === VERTICAL LIST === */
@@ -151,114 +82,128 @@ button:active {
 .vlist {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  place-items: center;
+  /* border: 1px solid blue; */
 }
 
 .hlist {
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  place-items: center;
+  /* border: 1px solid green; */
 }
 
 /* === LOGO === */
-.logo {
-  margin: 20px 0;
-}
+
+
 
 .logo p {
+  padding-top: 16px 0;
+  font-family: 'Press Start 2P', cursive;
   color: rgba(136, 110, 45, 0.87);
 }
 
-/* === DISPLAY CONTAINER === */
-
-#display-container {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
+/* === DISPLAY === */
 
 canvas {
   display: block;
   border: 2px solid #3e3e3e;
 }
 
-/* === REGISTERS VISUALIZATION === */
+/* === LED === */
 
-#register-container {
-  /* grid layout */
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: bold;
-  font-size: 6px;
-}
-
-#register-container input {
-  width: 100%;
+.led-off {
+  width: 16px;
   height: 16px;
+  background-color: rgb(97, 92, 92);
+  border-radius: 50%;
+}
+
+.led-reset {
+  width: 16px;
+  height: 16px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.led-halt {
+  width: 16px;
+  height: 16px;
+  background-color: rgb(0, 94, 255);
+  border-radius: 50%;
+}
+
+.led-alert {
+  width: 16px;
+  height: 16px;
+  background-color: yellow;
+  border-radius: 50%;
+}
+
+.led-on {
+  width: 16px;
+  height: 16px;
+  background-color: green;
+  border-radius: 50%;
+}
+
+/* SECTION */
+
+div.section {
+  width: 1024px;
+  border: 2px solid #cf6060;
+}
+
+div.section h4 {
+  margin: 12px;
+}
+
+/* === REGISTER TABLE === */
+
+div.registerview table {
+  width: 100%;
+  table-layout: fixed;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: normal;
+  font-size: 12px;
+  border: 1px solid #474343;
+}
+
+.registerview td {
+  width: 25%;
+  height: 24px;
+  background-color: #2a2929;
   font-size: 6px;
-  border: 1px solid #3e3e3e;
-  user-select: none;
-  background-color: #1a1a1a;
-  pointer-events: none;
+  text-align: center;
+  white-space: nowrap;
+  /* user-select: none; */
 }
-
-#register-container div {
-  margin-bottom: 8px;
-}
-
 
 /* === MEMORY DUMP === */
 
-
-#memory-editor {
-  margin-top: 20px;
+.memorydump textarea {
   width: 100%;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-
-#memory-view {
-  width: 100%;
-  height: 600px;
-  font-size: 8px;
+  min-height: 1024px;
   font-family: 'Courier New', Courier, monospace;
-  background-color: #1e1e1e;
+  font-weight: normal;
   color: #d4d4d4;
-  border: 1px solid #3e3e3e;
-  padding: 10px;
-  /* resize: vertical; */
-  /* line-height: 1.4; */
-  /* overflow: auto; */
-  white-space: pre;
+
+  resize: none;
+  outline: none;
+  border: 1px solid #474343;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* === KEYPAD === */
 
-#keypad {
+.keypadgrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 2px;
-  border: 8px solid #4d4949;
-  border-left: 8px solid hsl(0, 7%, 18%);
-  border-top: 8px solid hsl(0, 3%, 19%);
-  border-right: 8px solid hsl(0, 8%, 72%);
-  border-bottom: 8px solid hsl(0, 7%, 76%);
-  margin-left: 32px;
+  padding: 8px;
 }
 
-#keypad button {
+.keypadgrid button {
   font-size: 16px;
   width: 48px;
   height: 48px;
@@ -266,53 +211,24 @@ canvas {
   user-select: none;
 }
 
-/* === CONTROL BUTTONS === */
 
-#control-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-}
+/* === BORDERS === */
 
-#control-buttons button {
-  padding: 8px 16px;
-  font-size: 16px;
-  font-weight: bold;
-
-  cursor: pointer;
-  user-select: none;
-}
-
-#speed-select {
-  width: 100px;
-  padding: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.keypad-button:active,
-#control-buttons button:active {
-  transform: scale(0.95);
-}
-
-/* === DISKETTE === */
-
-#diskette-container {
+.borderdownthin {
   background-color: #1a1a1a;
   border: 2px solid #040404;
   border-right: 2px solid #625b5b;
   border-bottom: 2px solid #625b5b;
-  display: flex;
-  flex-grow: 0;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
   margin: 20px;
+  padding: 10px;
 }
 
-#rom-select {
-  width: 300px;
+.borderdown {
+  padding: 2px;
+  border: 8px solid #4d4949;
+  border-left: 8px solid hsl(0, 7%, 18%);
+  border-top: 8px solid hsl(0, 3%, 19%);
+  border-right: 8px solid hsl(0, 8%, 72%);
+  border-bottom: 8px solid hsl(0, 7%, 76%);
+  margin-left: 32px;
 }
