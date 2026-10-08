@@ -15,6 +15,7 @@ export class Application {
     isRunning: boolean;
     lastTimestampMs: number;
   };
+
   constructor() {
     // Initialize application state here if needed
     this.chip8 = new Chip8();
@@ -24,6 +25,7 @@ export class Application {
       lastTimestampMs: 0,
     };
   }
+
   init = () => {
     // Make sure the speed dropdown is updated to the initial TARGET_FPS
     this.domHandler.updateSpeedSelector(this.TARGET_FPS);
@@ -72,6 +74,7 @@ export class Application {
     // Init loop
     requestAnimationFrame(this.loop);
   };
+
   loop = (currentTimestampMs: number) => {
     // Timing
     const dtMs = currentTimestampMs - this.loopState.lastTimestampMs;

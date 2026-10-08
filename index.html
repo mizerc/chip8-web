@@ -11,14 +11,14 @@
 <body>
   <div class="vlist">
     <!-- LOGO -->
-    <div class="vlist borderdownthin logo">
+    <div class="vlist borderdownthin section logo">
       <h1>CHIP8 EMULATOR</h1>
       <p>Vite + TypeScript</p>
     </div>
 
-    <div class="hlist">
+    <div class="hlist section sticky">
       <!-- DISKETTE -->
-      <div id="diskette-container" class="hlist borderdownthin sticky">
+      <div id="diskette-container" class="hlist borderdownthin section">
         <select id="rom-select">
           <option disabled>Pick ROM...</option>
         </select>
@@ -85,6 +85,8 @@
         <li>Press LOAD to copy the ROM into memory</li>
         <li>Press START to begin execution, or CYCLE to execute a single instruction</li>
         <li>Press RESET to clear the memory and reset the emulator</li>
+        <li>The control panel has sticky positioning and remains visible when scrolling to allow you to see the register
+          or memory while cycling the CPU.</li>
       </ul>
     </div>
 
@@ -94,7 +96,7 @@
       <table>
         <tbody>
           <tr>
-            <td id="op-mne" colspan="4">MNE: MOV</td>
+            <td colspan="4"><span>MNE:</span><span id="op-mne">0x0000</span></td>
           </tr>
           <tr>
             <td><span>OP:</span><span id="op-reg">0x0000</span></td>
@@ -144,7 +146,7 @@
 
 
     <div class="vlist borderdownthin section">
-      <p>by Mauricio Ize</p>
+      <p>Mauricio Ize</p>
     </div>
 
     <!-- LOAD SCRIPT -->
