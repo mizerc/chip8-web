@@ -43,6 +43,8 @@
           <option value="4">4</option>
           <option value="8">8</option>
           <option value="24">24</option>
+          <option value="48">48</option>
+          <option value="60">60</option>
         </select>
         <p>&nbsp;</p>
         <!-- led indicator -->
@@ -59,21 +61,22 @@
         <button class="keypad-button" data-key="1">1</button>
         <button class="keypad-button" data-key="2">2</button>
         <button class="keypad-button" data-key="3">3</button>
-        <button class="keypad-button" data-key="A">A</button>
+        <button class="keypad-button" data-key="C">C</button>
+
 
         <button class="keypad-button" data-key="4">4</button>
         <button class="keypad-button" data-key="5">5</button>
         <button class="keypad-button" data-key="6">6</button>
-        <button class="keypad-button" data-key="B">B</button>
+        <button class="keypad-button" data-key="D">D</button>
 
         <button class="keypad-button" data-key="7">7</button>
         <button class="keypad-button" data-key="8">8</button>
         <button class="keypad-button" data-key="9">9</button>
-        <button class="keypad-button" data-key="C">C</button>
-
-        <button class="keypad-button" data-key="0">0</button>
-        <button class="keypad-button" data-key="D">D</button>
         <button class="keypad-button" data-key="E">E</button>
+
+        <button class="keypad-button" data-key="A">A</button>
+        <button class="keypad-button" data-key="0">0</button>
+        <button class="keypad-button" data-key="B">B</button>
         <button class="keypad-button" data-key="F">F</button>
       </div>
     </div>
@@ -81,12 +84,16 @@
     <div class="section vlist borderdownthin instructions">
       <h4>Instructions</h4>
       <ul>
-        <li>Select a ROM in the dropdown menu</li>
-        <li>Press LOAD to copy the ROM into memory</li>
+        <li>Select a ROM in the dropdown menu.</li>
+        <li>Press LOAD to copy the ROM from disk to CHIP-8 memory at 0x0200.</li>
         <li>Press START to begin execution, or CYCLE to execute a single instruction</li>
-        <li>Press RESET to clear the memory and reset the emulator</li>
+        <li>Press RESET to clear the registers and memory; so you will need to press LOAD and START/CYCLE again to
+          continue execution.</li>
         <li>The control panel has sticky positioning and remains visible when scrolling to allow you to see the register
           or memory while cycling the CPU.</li>
+        <li>If you press CYCLE while the emulator is running, it will execute a single instruction and then pause.</li>
+        <li>The clock dropdown selects the FPS of the application loop. The emulator runs at hardcoded 1 cycle per frame.</li>
+
       </ul>
     </div>
 
@@ -96,41 +103,46 @@
       <table>
         <tbody>
           <tr>
-            <td colspan="4"><span>MNE:</span><span id="op-mne">0x0000</span></td>
+            <td colspan="4"><span>MNE:</span><span id="op-mne">N/A</span></td>
           </tr>
           <tr>
-            <td><span>OP:</span><span id="op-reg">0x0000</span></td>
-            <td><span>PC:</span><span id="pc-reg">0x0000</span></td>
-            <td><span>I:</span><span id="i-reg">0x0000</span></td>
-            <td><span>SP:</span><span id="sp-reg">0x0000</span></td>
+            <td><span>PC:</span><span id="pc-reg"></span></td>
+            <td><span>OP:</span><span id="op-reg"></span></td>
+            <td><span>&nbsp;I:</span><span id="i-reg"></span></td>
+            <td><span>SP:</span><span id="sp-reg"></span></td>
           </tr>
           <tr>
-            <td><span>DT:</span><span id="dt-reg">0x0000</span></td>
-            <td><span>ST:</span><span id="st-reg">0x0000</span></td>
-            <td><span>V0:</span><span id="v0-reg">0x0000</span></td>
-            <td><span>V1:</span><span id="v1-reg">0x0000</span></td>
+            <td><span>DT:</span><span id="dt-reg"></span></td>
+            <td><span>ST:</span><span id="st-reg"></span></td>
+            <td colspan="2"></td>
+
           </tr>
           <tr>
-            <td><span>V2:</span><span id="v2-reg">0x0000</span></td>
-            <td><span>V3:</span><span id="v3-reg">0x0000</span></td>
-            <td><span>V4:</span><span id="v4-reg">0x0000</span></td>
-            <td><span>V5:</span><span id="v5-reg">0x0000</span></td>
+            <td><span>V0:</span><span id="v0-reg"></span></td>
+            <td><span>V1:</span><span id="v1-reg"></span></td>
+            <td><span>V2:</span><span id="v2-reg"></span></td>
+            <td><span>V3:</span><span id="v3-reg"></span></td>
+
           </tr>
           <tr>
-            <td><span>V6:</span><span id="v6-reg">0x0000</span></td>
-            <td><span>V7:</span><span id="v7-reg">0x0000</span></td>
-            <td><span>V8:</span><span id="v8-reg">0x0000</span></td>
-            <td><span>V9:</span><span id="v9-reg">0x0000</span></td>
+            <td><span>V4:</span><span id="v4-reg"></span></td>
+            <td><span>V5:</span><span id="v5-reg"></span></td>
+            <td><span>V6:</span><span id="v6-reg"></span></td>
+            <td><span>V7:</span><span id="v7-reg"></span></td>
+
           </tr>
           <tr>
-            <td><span>VA:</span><span id="va-reg">0x0000</span></td>
-            <td><span>VB:</span><span id="vb-reg">0x0000</span></td>
-            <td><span>VC:</span><span id="vc-reg">0x0000</span></td>
-            <td><span>VD:</span><span id="vd-reg">0x0000</span></td>
+            <td><span>V8:</span><span id="v8-reg"></span></td>
+            <td><span>V9:</span><span id="v9-reg"></span></td>
+            <td><span>VA:</span><span id="v10-reg"></span></td>
+            <td><span>VB:</span><span id="v11-reg"></span></td>
+
           </tr>
           <tr>
-            <td><span>VE:</span><span id="ve-reg">0x0000</span></td>
-            <td><span>VF:</span><span id="vf-reg">0x0000</span></td>
+            <td><span>VC:</span><span id="v12-reg"></span></td>
+            <td><span>VD:</span><span id="v13-reg"></span></td>
+            <td><span>VE:</span><span id="v14-reg"></span></td>
+            <td><span>VF:</span><span id="v15-reg"></span></td>
           </tr>
 
         </tbody>

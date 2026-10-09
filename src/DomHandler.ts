@@ -41,6 +41,172 @@ export class DomHandler {
     };
     asyncUpdateRomList();
   }
+
+  attachListeners = (handlers: {
+    onResetPress: () => void;
+    onStartStopPress: () => void;
+    onCyclePress: () => void;
+    onSpeedDropdownChange: (speed: number) => void;
+    onRomReadDone: (romBytes: Uint8Array) => void;
+  }) => {
+    // DOM BUTTONS
+    document.getElementById("reset-button")?.addEventListener("click", () => {
+      handlers.onResetPress();
+    });
+    document
+      .getElementById("start-stop-button")
+      ?.addEventListener("click", () => {
+        handlers.onStartStopPress();
+      });
+
+    document.getElementById("cycle-button")?.addEventListener("click", () => {
+      handlers.onCyclePress();
+    });
+
+    // KEYBOARD EVENT
+    window.addEventListener("keydown", (e) => {
+      const key = e.key.toUpperCase();
+      console.log(key);
+      this.keyboardState.set(key, true);
+    });
+    window.addEventListener("keyup", (e) => {
+      const key = e.key.toUpperCase();
+      console.log(key);
+      this.keyboardState.set(key, false);
+    });
+
+    // ROM SELECT OR LOAD ROM BUTTON
+    document
+      .getElementById("load-rom-button")
+      ?.addEventListener("click", async () => {
+        const romSelect = document.getElementById(
+          "rom-select",
+        ) as HTMLSelectElement;
+        const romFileName = romSelect.value;
+        const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
+        const response = await fetch(romUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const romBytes = new Uint8Array(arrayBuffer);
+        handlers.onRomReadDone(romBytes);
+      });
+    // SPEED SELECTOR
+    const speedSelect = document.getElementById(
+      "speed-select",
+    ) as HTMLSelectElement;
+    speedSelect.addEventListener("change", () => {
+      const speed = parseInt(speedSelect.value, 10);
+      handlers.onSpeedDropdownChange(speed);
+    });
+
+    // DOM KEYPAD BUTTONS
+    const keypadButtons = document.querySelectorAll(".keypad-button");
+    keypadButtons.forEach((button) => {
+      button.addEventListener("pointerdown", () => {
+        // Enable state
+        const keyCode = (button as HTMLButtonElement).dataset.key;
+        if (keyCode) {
+          this.keyboardState.set(keyCode, true);
+        }
+      });
+      button.addEventListener("pointerup", () => {
+        // Disable state
+        const keyCode = (button as HTMLButtonElement).dataset.key;
+        if (keyCode) {
+          this.keyboardState.set(keyCode, false);
+        }
+      });
+      button.addEventListener("pointerleave", () => {
+        // Disable state when pointer leaves the button
+        const keyCode = (button as HTMLButtonElement).dataset.key;
+        if (keyCode) {
+          this.keyboardState.set(keyCode, false);
+        }
+      });
+    });
+  };
+
+  disableDomControlBtos = (disable: boolean) => {
+    const startStopButton = document.getElementById("start-stop-button");
+    const cycleButton = document.getElementById("cycle-button");
+    const resetButton = document.getElementById("reset-button");
+    const speedSelector = document.getElementById("speed-select");
+
+    if (!startStopButton || !cycleButton || !resetButton || !speedSelector) {
+      return;
+    }
+
+    if (disable) {
+      (startStopButton as HTMLButtonElement).disabled = true;
+      (cycleButton as HTMLButtonElement).disabled = true;
+      (resetButton as HTMLButtonElement).disabled = true;
+      (speedSelector as HTMLSelectElement).disabled = true;
+
+      startStopButton.classList.add("disabled");
+      cycleButton.classList.add("disabled");
+      resetButton.classList.add("disabled");
+      speedSelector.classList.add("disabled");
+    } else {
+      (startStopButton as HTMLButtonElement).disabled = false;
+      (cycleButton as HTMLButtonElement).disabled = false;
+      (resetButton as HTMLButtonElement).disabled = false;
+      (speedSelector as HTMLSelectElement).disabled = false;
+
+      startStopButton.classList.remove("disabled");
+      cycleButton.classList.remove("disabled");
+      resetButton.classList.remove("disabled");
+      speedSelector.classList.remove("disabled");
+    }
+  };
+
+  updateFieldStr = (id: string, value: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el instanceof HTMLInputElement) {
+      el.value = value;
+    } else {
+      el.textContent = value;
+    }
+  };
+  updateFieldHex = (id: string, value: number, width: number) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const hex = "0x" + value.toString(16).toUpperCase().padStart(width, "0");
+    if (el instanceof HTMLInputElement) {
+      el.value = hex;
+    } else {
+      el.textContent = hex;
+    }
+  };
+
+  updateDomRegisters = (chip8: Chip8) => {
+    // Update memmonic field
+    this.updateFieldStr("op-mne", `${getMnemonic(chip8.OPCODE)}`);
+    // Update core fields
+    this.updateFieldHex("i-reg", chip8.R_I, 3);
+    this.updateFieldHex("op-reg", chip8.OPCODE, 4);
+    this.updateFieldHex("pc-reg", chip8.R_PC, 4);
+    this.updateFieldHex("sp-reg", chip8.R_SP, 2);
+    this.updateFieldHex("dt-reg", chip8.R_DELAY_TIMER, 2);
+    this.updateFieldHex("st-reg", chip8.R_AUDIO_TIMER, 2);
+    // Update V registers (V0 to VF, 8 bits)
+    for (let i = 0; i < 16; i++) {
+      this.updateFieldHex(`v${i}-reg`, chip8.REG[i], 1);
+    }
+  };
+
+  resetDomRegisters = () => {
+    this.updateFieldStr("op-mne", "");
+    this.updateFieldHex("i-reg", 0, 3);
+    this.updateFieldHex("op-reg", 0, 4);
+    this.updateFieldHex("pc-reg", Chip8.START_ADDRESS, 4);
+    this.updateFieldHex("sp-reg", 0, 2);
+    this.updateFieldHex("dt-reg", 0, 2);
+    this.updateFieldHex("st-reg", 0, 2);
+    for (let i = 0; i < 16; i++) {
+      this.updateFieldHex(`v${i}-reg`, 0, 1);
+    }
+  };
+
   flipLedIndicator = () => {
     const ledIndicator = document.getElementById("led-indicator");
     if (!ledIndicator) {
@@ -101,136 +267,24 @@ export class DomHandler {
       ledIndicator.classList.add("led-reset");
     }
   };
+  updateStartStopButton = (state: "START" | "STOP") => {
+    const startStopButton = document.getElementById("start-stop-button");
+    if (!startStopButton) {
+      return;
+    }
+    if (state === "START") {
+      startStopButton.textContent = "START";
+    } else if (state === "STOP") {
+      startStopButton.textContent = "STOP\u00A0";
+    }
+  };
   updateSpeedSelector = (targetFps: number) => {
     const speedSelect = document.getElementById(
       "speed-select",
     ) as HTMLSelectElement;
     speedSelect.value = targetFps.toString();
   };
-  attachListeners = (handlers: {
-    onResetPress: () => void;
-    onRunPress: () => void;
-    onPausePress: () => void;
-    onCyclePress: () => void;
-    onSpeedDropdownChange: (speed: number) => void;
-    onRomReadDone: (romBytes: Uint8Array) => void;
-  }) => {
-    // DOM BUTTONS
-    document.getElementById("reset-button")?.addEventListener("click", () => {
-      handlers.onResetPress();
-    });
-    document.getElementById("start-button")?.addEventListener("click", () => {
-      handlers.onRunPress();
-    });
-    document.getElementById("pause-button")?.addEventListener("click", () => {
-      handlers.onPausePress();
-    });
-    document.getElementById("cycle-button")?.addEventListener("click", () => {
-      handlers.onCyclePress();
-    });
-    // KEYBOARD EVENT
-    window.addEventListener("keydown", (e) => {
-      const key = e.key.toUpperCase();
-      console.log(key);
-      this.keyboardState.set(key, true);
-    });
-    window.addEventListener("keyup", (e) => {
-      const key = e.key.toUpperCase();
-      console.log(key);
-      this.keyboardState.set(key, false);
-    });
-    // ROM SELECT OR LOAD ROM BUTTON
-    // ROM loader event listener
-    document
-      .getElementById("load-rom-button")
-      ?.addEventListener("click", async () => {
-        const romSelect = document.getElementById(
-          "rom-select",
-        ) as HTMLSelectElement;
-        const romFileName = romSelect.value;
-        const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
-        const response = await fetch(romUrl);
-        const arrayBuffer = await response.arrayBuffer();
-        const romBytes = new Uint8Array(arrayBuffer);
-        handlers.onRomReadDone(romBytes);
-      });
-    // SPEED SELECTOR
-    const speedSelect = document.getElementById(
-      "speed-select",
-    ) as HTMLSelectElement;
-    speedSelect.addEventListener("change", () => {
-      const speed = parseInt(speedSelect.value, 10);
-      handlers.onSpeedDropdownChange(speed);
-    });
-    // DOM KEYPAD BUTTONS
-    const keypadButtons = document.querySelectorAll(".keypad-button");
-    keypadButtons.forEach((button) => {
-      button.addEventListener("pointerdown", () => {
-        // Enable state
-        const keyCode = (button as HTMLButtonElement).dataset.key;
-        if (keyCode) {
-          this.keyboardState.set(keyCode, true);
-        }
-      });
-      button.addEventListener("pointerup", () => {
-        // Disable state
-        const keyCode = (button as HTMLButtonElement).dataset.key;
-        if (keyCode) {
-          this.keyboardState.set(keyCode, false);
-        }
-      });
-      button.addEventListener("pointerleave", () => {
-        // Disable state when pointer leaves the button
-        const keyCode = (button as HTMLButtonElement).dataset.key;
-        if (keyCode) {
-          this.keyboardState.set(keyCode, false);
-        }
-      });
-    });
-  };
-  updateFieldStr = (id: string, value: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (el instanceof HTMLInputElement) {
-      el.value = value;
-    } else {
-      el.textContent = value;
-    }
-  };
-  updateFieldHex = (id: string, value: number, width: number) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const hex = `A:` + value.toString(16).toUpperCase().padStart(width, "0");
-    if (el instanceof HTMLInputElement) {
-      el.value = hex;
-    } else {
-      el.textContent = hex;
-    }
-  };
-  updateRegisters = (chip8: Chip8) => {
-    this.updateFieldHex("op-reg", chip8.OPCODE, 4);
-    this.updateFieldStr("op-mne", `${getMnemonic(chip8.OPCODE)}`);
-    this.updateFieldHex("pc-reg", chip8.R_PC, 4);
-    this.updateFieldHex("i-reg", chip8.R_I, 4);
-    this.updateFieldHex("sp-reg", chip8.R_SP, 2);
-    this.updateFieldHex("dt-reg", chip8.R_DELAY_TIMER, 2);
-    this.updateFieldHex("st-reg", chip8.R_AUDIO_TIMER, 2);
-    for (let i = 0; i < 16; i++) {
-      this.updateFieldHex(`v${i}-reg`, chip8.REG[i], 2);
-    }
-  };
-  resetRegisters = () => {
-    this.updateFieldHex("op-reg", 0, 4);
-    this.updateFieldStr("op-mne", "");
-    this.updateFieldHex("pc-reg", Chip8.START_ADDRESS, 4);
-    this.updateFieldHex("i-reg", 0, 4);
-    this.updateFieldHex("sp-reg", 0, 2);
-    this.updateFieldHex("dt-reg", 0, 2);
-    this.updateFieldHex("st-reg", 0, 2);
-    for (let i = 0; i < 16; i++) {
-      this.updateFieldHex(`v${i}-reg`, 0, 2);
-    }
-  };
+
   // Draw chip8 video memory to video canvas
   renderVideoMemoryToCanva = (chip8: Chip8) => {
     // Get a new canvas
@@ -260,7 +314,7 @@ export class DomHandler {
     backCanvasCtx.putImageData(imageData, 0, 0);
 
     /**
-     * Since backCanvas has lower resolution, 
+     * Since backCanvas has lower resolution,
      * it will be scaled up when drawn onto the domCanvas,
      * creating a pixelated effect.
      */
@@ -279,26 +333,37 @@ export class DomHandler {
       this.domCanvas.height,
     );
   };
-  updateMemoryViewDom = (chip8: Chip8) => {
+  disableLoadButton = (disable: boolean) => {
+    const loadButton = document.getElementById(
+      "load-rom-button",
+    ) as HTMLButtonElement;
+    if (disable) {
+      loadButton.disabled = true;
+      loadButton.classList.add("disabled");
+    } else {
+      loadButton.disabled = false;
+      loadButton.classList.remove("disabled");
+    }
+  };
+  updateMemoryDumpDom = (chip8: Chip8) => {
     const memoryViewDom = document.getElementById(
       "memory-textarea",
     ) as HTMLTextAreaElement;
-
     if (!memoryViewDom) return;
 
+    // BUILD MEMORY DUMP TEXT
     let memoryText = "";
     const bytesPerLine = 16;
     const totalBytes = chip8.memory.length;
-
     for (let addr = 0; addr < totalBytes; addr += bytesPerLine) {
       // Address column
       const addrHex = addr.toString(16).toUpperCase().padStart(4, "0");
-      memoryText += `${addrHex}: `;
+      memoryText += `${addrHex}:`;
 
       // For each byte of current line
-      for (let i = 0; i < bytesPerLine; i++) {
-        if (addr + i < totalBytes) {
-          const currentAddr = addr + i;
+      for (let byteIdx = 0; byteIdx < bytesPerLine; byteIdx++) {
+        if (addr + byteIdx < totalBytes) {
+          const currentAddr = addr + byteIdx;
           const byte = chip8.memory[currentAddr];
           const byteHex = byte.toString(16).toUpperCase().padStart(2, "0");
 
@@ -306,21 +371,34 @@ export class DomHandler {
           if (currentAddr === chip8.R_PC) {
             memoryText += `[${byteHex}`;
           } else if (currentAddr === chip8.R_PC + 1) {
-            memoryText += `${byteHex}]`;
-          } else {
-            memoryText += byteHex + " ";
+            memoryText += ` ${byteHex}]`;
+          }
+          // Print regular byte
+          else {
+            const prevChar = memoryText.charAt(memoryText.length - 1);
+            if (prevChar == "]") {
+              memoryText += "" + byteHex;
+            } else {
+              memoryText += " " + byteHex;
+            }
           }
         } else {
-          memoryText += "   ";
+          memoryText += "X";
         }
       }
 
       // ASCII column
-      memoryText += " | ";
+      const prevChar = memoryText.charAt(memoryText.length - 1);
+      if (prevChar == "]") {
+        memoryText += "| ";
+      } else {
+        memoryText += " | ";
+      }
+
       for (let i = 0; i < bytesPerLine; i++) {
         if (addr + i < totalBytes) {
           const byte = chip8.memory[addr + i];
-          // Print ASCII character if printable, otherwise '.'
+          // Print ASCII character, if printable, otherwise '.'
           const char =
             byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
           memoryText += char;
