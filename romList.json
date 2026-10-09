@@ -1,7 +1,39 @@
 [
   {
+    "name": "BMP Viewer - Hello (C8 example) [Hap, 2005].ch8",
+    "path": "/roms/BMP Viewer - Hello (C8 example) [Hap, 2005].ch8"
+  },
+  {
+    "name": "Chip8 Picture.ch8",
+    "path": "/roms/Chip8 Picture.ch8"
+  },
+  {
+    "name": "Chip8 emulator Logo [Garstyciuks].ch8",
+    "path": "/roms/Chip8 emulator Logo [Garstyciuks].ch8"
+  },
+  {
+    "name": "Craps [Camerlo Cortez, 1978].ch8",
+    "path": "/roms/Craps [Camerlo Cortez, 1978].ch8"
+  },
+  {
+    "name": "Hi-Lo [Jef Winsor, 1978].ch8",
+    "path": "/roms/Hi-Lo [Jef Winsor, 1978].ch8"
+  },
+  {
     "name": "IBM_Logo.ch8",
     "path": "/roms/IBM_Logo.ch8"
+  },
+  {
+    "name": "Kaleidoscope [Joseph Weisbecker, 1978].ch8",
+    "path": "/roms/Kaleidoscope [Joseph Weisbecker, 1978].ch8"
+  },
+  {
+    "name": "Life [GV Samways, 1980].ch8",
+    "path": "/roms/Life [GV Samways, 1980].ch8"
+  },
+  {
+    "name": "Lunar Lander (Udo Pernisz, 1979).ch8",
+    "path": "/roms/Lunar Lander (Udo Pernisz, 1979).ch8"
   },
   {
     "name": "Pong1player.ch8",
@@ -12,6 +44,10 @@
     "path": "/roms/Rocket_Launcher.ch8"
   },
   {
+    "name": "SQRT Test [Sergey Naydenov, 2010].ch8",
+    "path": "/roms/SQRT Test [Sergey Naydenov, 2010].ch8"
+  },
+  {
     "name": "Space_Invaders_David_Winter.ch8",
     "path": "/roms/Space_Invaders_David_Winter.ch8"
   },
@@ -20,7 +56,15 @@
     "path": "/roms/Space_Invaders_David_Winter_alt.ch8"
   },
   {
+    "name": "Submarine [Carmelo Cortez, 1978].ch8",
+    "path": "/roms/Submarine [Carmelo Cortez, 1978].ch8"
+  },
+  {
     "name": "Tetris_Fran_Dachille_1991.ch8",
     "path": "/roms/Tetris_Fran_Dachille_1991.ch8"
+  },
+  {
+    "name": "chip8-test-rom-with-audio.ch8",
+    "path": "/roms/chip8-test-rom-with-audio.ch8"
   }
 ]
