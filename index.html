@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CHIP-8 EMULATOR</title>
-  <script type="module" crossorigin src="/chip8-web/assets/index-B9kgHmS1.js"></script>
+  <title>CHIP8-WEB</title>
+  <script type="module" crossorigin src="/chip8-web/assets/index-CXeqEHFs.js"></script>
   <link rel="stylesheet" crossorigin href="/chip8-web/assets/index-D307NztX.css">
 </head>
 
@@ -13,27 +13,25 @@
   <div class="vlist">
     <!-- LOGO -->
     <div class="vlist borderdownthin section logo">
-      <h1>CHIP8 EMULATOR</h1>
-      <p>Vite + TypeScript</p>
+      <h1>CHIP8-WEB</h1>
+      <p>A CHIP-8 emulator built with Vite + TypeScript</p>
     </div>
 
-    <div class="hlist section sticky">
-      <!-- DISKETTE -->
-      <div id="diskette-container" class="hlist borderdownthin section">
+    <div class="vlist borderdownthin section sticky">
+      <!-- ROM FILEPICKER AND ROM SELECTOR -->
+      <div class="hlist">
+        <input type="file" id="rom-upload-input" accept=".ch8" style="display: none;" />
+        <button id="upload-rom-button">FROM FILE</button>
+        <button id="clear-rom-button" title="Clear selected file" style="display: none;">X</button>
+        <p>or</p>
         <select id="rom-select">
           <option disabled>Pick ROM...</option>
         </select>
-        <button id="load-rom-button">LOAD</button>
+      </div>
 
-        <p>&nbsp;</p>
-
-        <!-- <p>&nbsp;</p>
-            <p>or</p>
-            <p>&nbsp;</p>
-            <input type="file" id="rom-upload-input" accept=".ch8" style="display: none;" />
-            <button id="upload-rom-button">LOAD FROM FILE</button> -->
-
+      <div class="hlist">
         <!-- CONTROL BUTTONS -->
+        <button id="load-rom-button">LOAD</button>
         <button id="start-stop-button">START</button>
         <button id="cycle-button">CYCLE</button>
         <button id="reset-button">RESET</button>
@@ -86,14 +84,16 @@
       <h4>Instructions</h4>
       <ul>
         <li>Select a ROM in the dropdown menu.</li>
-        <li>Press LOAD to copy the ROM from disk to CHIP-8 memory at 0x0200.</li>
-        <li>Press START to begin execution, or CYCLE to execute a single instruction</li>
-        <li>Press RESET to clear the registers and memory; so you will need to press LOAD and START/CYCLE again to
-          continue execution.</li>
-        <li>The control panel has sticky positioning and remains visible when scrolling to allow you to see the register
+        <li>Press LOAD to copy the ROM from disk to CHIP-8 memory at address 0x0200.</li>
+        <li>Press START to start the execution, or CYCLE to execute a single instruction.</li>
+        <li>Press RESET to clear the registers and memory; after that, you will need to load a ROM and start execution
+          again.</li>
+        <li>The control panel has sticky positioning and remains visible when scrolling to allow you to see the
+          registers
           or memory while cycling the CPU.</li>
         <li>If you press CYCLE while the emulator is running, it will execute a single instruction and then pause.</li>
-        <li>The clock dropdown selects the FPS of the application loop. The emulator runs at hardcoded 1 cycle per frame.</li>
+        <li>The clock dropdown selects the FPS of the application. The emulator runs at hardcoded 1 cycle per
+          frame. So, for example, if you set the FPS to 60, the emulator will execute 60 cycles per second.</li>
 
       </ul>
     </div>
