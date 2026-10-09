@@ -75,20 +75,53 @@ export class DomHandler {
       this.keyboardState.set(key, false);
     });
 
-    // ROM SELECT OR LOAD ROM BUTTON
+    // ROM FROM FILE: only stores the bytes; LOAD sends them to the emulator
+    let uploadedRomBytes: Uint8Array | null = null;
+    const romSelect = document.getElementById(
+      "rom-select",
+    ) as HTMLSelectElement;
+    const romUploadInput = document.getElementById(
+      "rom-upload-input",
+    ) as HTMLInputElement;
+    const uploadButton = document.getElementById(
+      "upload-rom-button",
+    ) as HTMLButtonElement;
+    const clearButton = document.getElementById(
+      "clear-rom-button",
+    ) as HTMLButtonElement;
+    const clearUploadedRom = () => {
+      uploadedRomBytes = null;
+      uploadButton.textContent = "FROM FILE";
+      clearButton.style.display = "none";
+    };
+    uploadButton.addEventListener("click", () => romUploadInput.click());
+    clearButton.addEventListener("click", clearUploadedRom);
+    romUploadInput.addEventListener("change", async () => {
+      const file = romUploadInput.files?.[0];
+      if (!file) return;
+      uploadedRomBytes = new Uint8Array(await file.arrayBuffer());
+      uploadButton.textContent = file.name;
+      clearButton.style.display = "";
+      // Reset so selecting the same file again re-triggers "change"
+      romUploadInput.value = "";
+    });
+    // Choosing from the dropdown discards the uploaded file
+    romSelect.addEventListener("change", clearUploadedRom);
+
+    // LOAD ROM BUTTON
     document
       .getElementById("load-rom-button")
       ?.addEventListener("click", async () => {
-        const romSelect = document.getElementById(
-          "rom-select",
-        ) as HTMLSelectElement;
-        const romFileName = romSelect.value;
-        const romUrl = `${import.meta.env.BASE_URL}roms/${romFileName}`;
+        if (uploadedRomBytes) {
+          handlers.onRomReadDone(uploadedRomBytes);
+          return;
+        }
+        const romUrl = `${import.meta.env.BASE_URL}roms/${romSelect.value}`;
         const response = await fetch(romUrl);
         const arrayBuffer = await response.arrayBuffer();
-        const romBytes = new Uint8Array(arrayBuffer);
-        handlers.onRomReadDone(romBytes);
+        handlers.onRomReadDone(new Uint8Array(arrayBuffer));
       });
+
     // SPEED SELECTOR
     const speedSelect = document.getElementById(
       "speed-select",
@@ -346,10 +379,14 @@ export class DomHandler {
     }
   };
   updateMemoryDumpDom = (chip8: Chip8) => {
+    // Grab DOM
     const memoryViewDom = document.getElementById(
       "memory-textarea",
     ) as HTMLTextAreaElement;
     if (!memoryViewDom) return;
+
+    // Save current scroll position
+    const previousScrollTop = memoryViewDom.scrollTop;
 
     // BUILD MEMORY DUMP TEXT
     let memoryText = "";
@@ -409,6 +446,9 @@ export class DomHandler {
     }
 
     memoryViewDom.value = memoryText;
+    
+    // Restore previous scroll position
+    memoryViewDom.scrollTop = previousScrollTop;
 
     // Auto-scroll to PC location
     const pcLine = Math.floor(chip8.R_PC / bytesPerLine);
